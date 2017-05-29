@@ -1,0 +1,23 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8}]
+\PYG{n}{L} \PYG{o}{=} \PYG{l+m+mf}{0.1}\PYG{p}{;}
+
+\PYG{c+c1}{// Puntos}
+\PYG{n}{Point}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{L}\PYG{p}{\PYGZcb{};}
+\PYG{n}{Point}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{L}\PYG{p}{\PYGZcb{};}
+\PYG{n}{Point}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{)} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{L}\PYG{p}{\PYGZcb{};}
+
+\PYG{c+c1}{// Líneas}
+\PYG{n}{Line}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+m+mi}{3}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{\PYGZcb{};}
+\PYG{n}{Line}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{\PYGZcb{};}
+\PYG{n}{Circle}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{)} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{\PYGZcb{};}
+
+\PYG{c+c1}{// Superficie}
+\PYG{n}{Line} \PYG{n+nf}{Loop}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{\PYGZcb{};}
+\PYG{n}{Plane} \PYG{n+nf}{Surface}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+m+mi}{1}\PYG{p}{\PYGZcb{};}
+
+\PYG{c+c1}{// Grupos Físicos}
+\PYG{n}{Physical} \PYG{n+nf}{Line}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+m+mi}{1}\PYG{p}{\PYGZcb{};}
+\PYG{n}{Physical} \PYG{n+nf}{Line}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+m+mi}{2}\PYG{p}{\PYGZcb{};}
+\PYG{n}{Physical} \PYG{n+nf}{Point}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{)} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+m+mi}{3}\PYG{p}{\PYGZcb{};}
+\PYG{n}{Physical} \PYG{n+nf}{Surface}\PYG{p}{(}\PYG{l+m+mi}{4}\PYG{p}{)} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+m+mi}{1}\PYG{p}{\PYGZcb{};}
+\end{Verbatim}

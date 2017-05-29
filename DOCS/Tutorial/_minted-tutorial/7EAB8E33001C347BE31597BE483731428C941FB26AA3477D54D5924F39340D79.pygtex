@@ -1,0 +1,9 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8}]
+\PYG{k+kn}{from} \PYG{n+nn}{\PYGZus{}\PYGZus{}future\PYGZus{}\PYGZus{}} \PYG{k+kn}{import} \PYG{n}{division}\PYG{p}{,} \PYG{n}{print\PYGZus{}function}
+\PYG{k+kn}{import} \PYG{n+nn}{meshio}
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k+kn}{as} \PYG{n+nn}{np}
+
+
+\PYG{n}{points}\PYG{p}{,} \PYG{n}{cells}\PYG{p}{,} \PYG{n}{point\PYGZus{}data}\PYG{p}{,} \PYG{n}{cell\PYGZus{}data}\PYG{p}{,} \PYG{n}{field\PYGZus{}data} \PYG{o}{=} \PYGZbs{}
+    \PYG{n}{meshio}\PYG{o}{.}\PYG{n}{read}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Prueba\PYGZus{}brasilera.msh\PYGZdq{}}\PYG{p}{)}
+\end{Verbatim}

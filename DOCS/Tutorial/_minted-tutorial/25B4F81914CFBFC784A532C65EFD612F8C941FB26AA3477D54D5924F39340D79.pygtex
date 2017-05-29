@@ -1,0 +1,6 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8}]
+\PYG{c+c1}{\PYGZsh{} Fronteras}
+\PYG{n}{lines} \PYG{o}{=} \PYG{n}{cells}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}line\PYGZdq{}}\PYG{p}{]}
+\PYG{n}{bounds} \PYG{o}{=} \PYG{n}{cell\PYGZus{}data}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}line\PYGZdq{}}\PYG{p}{][}\PYG{l+s+s2}{\PYGZdq{}physical\PYGZdq{}}\PYG{p}{]}
+\PYG{n}{nbounds} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{bounds}\PYG{p}{)}
+\end{Verbatim}

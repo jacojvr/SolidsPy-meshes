@@ -1,0 +1,453 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[left=4cm,right=3cm,top=4cm,bottom=2cm]{geometry}
+\usepackage{url}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{minted}
+
+\captionsetup{
+    margin=20pt,
+    font=small,
+    labelfont=bf,
+    labelsep=period
+    }
+
+\renewcommand{\listingscaption}{Código}
+\newcommand{\mintpy}[1]{\mintinline{python}{#1}}
+
+
+\title{\textbf{Tutorial: Solución de modelos 2D usando el Método de Elementos Finitos}}
+\author{Área de Mecánica Computacional}
+
+\begin{document}
+\maketitle
+
+\abstract{Este documento es un tutorial sobre cómo generar una geometría (específica) usando Gmsh\footnote{Gmsh es un software libre para la generación de mallas 2D y 3D para simulaciones de elementos finitos \cite{gmsh}} y su posterior procesamiento para la generación de archivos de entrada para un programa de Elementos Finitos en Python\footnote{El programa de elementos finitos trabajado en clase escrito en Python que puede descargarse del sitio \url{https://github.com/jgomezc1/FEM_PYTHON}.} . Este documento no pretende ser una introducción al manejo de Gmsh, para ello se sugiere el tutorial de la reference \cite{avdis2012}, el tutorial oficial de Gmsh \cite{gmsh-tutorial} (para el manejo en modo texto) o los \emph{screencasts} oficiales \cite{gmsh-screencast} (para el manejo de la interfaz gráfica). Este documento tampoco pretende ser un tutorial sobre el manejo de Python para Ingeniería, para ello se sugiere las \emph{notas de clase} ``SciPy Lecture notes'' \cite{scipy-lectures} o el libro \cite{programming_python}.}
+
+
+
+\section{Modelo a resolver}
+El ejemplo que se piensa resolver corresponde con la determinación de esfuerzos en un cilindro en la \emph{Prueba Brasilera}. La Prueba Brasilera  es una técnica que se usa para la medida indirecta de la resitencia de rocas. Es una técnica simple y efectiva, y por ello es comúnmente usada para medidas de rocas. En algunas ocasiones esta prueba se usa también para concreto \cite{brazilian_test}.
+
+La siguiente figura presenta un esquema del modelo a resolver. Ya que el modelo original puede presentar desplazamientos de cuerpo rígido, se decide utilizar la simetría del problema. Entonces, el problema a resolver es un cuarto del problema original y las superficies inferior e izquierda presentan restricciones de \emph{rodillo}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=6cm]{img/Prueba_brasilera.pdf} 
+    \caption{Esquema del modelo a resolver.}
+\end{figure}
+
+\section{Generación de la geometría y malla en Gmsh}
+Como primer paso, se sugiere crear un nuevo archivo en Gmsh, como se muestra en la siguiente figura.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=8cm]{img/Nuevo_archivo.png} 
+    \caption{Creación de nuevo archivo en Gmsh.}
+\end{figure}
+
+Al crear un nuevo documento es posible\footnote{Si la versión es 3.0 o mayor, esta ventana emergente aparecerá} que Gmsh pregunte sobre cuál motor geométrico usar. No nos detendremos en cuáles son las diferencias y usaremos \texttt{built-in}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=2cm]{img/Motor_geometrico.png} 
+    \caption{Ventana emergente preguntando por el motor geométrico.}
+\end{figure}
+
+Para crear un modelo, inicialmente creamos los puntos. Para ello, vamos a la opción: \texttt{Geometry > Elementary Entities > Add > Point}, como se muestra en la siguiente figura. Luego, se añaden las coordenadas de los puntos en la ventana emergente y ``Add''. Para finalizar podemos cerrar la ventana emergente y presionar \texttt{e}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=8cm]{img/Agregar_puntos.png} 
+    \caption{Agregar puntos al modelo.}
+\end{figure}
+
+Posteriormente creamos líneas. Para ello, vamos a la opción: \texttt{Geometry > Elementary Entities > Add > Straight line}, como se muestra en la siguiente figura, y seleccionamos los puntos iniciales y finales para cada línea. Al finalizar, podemos presionar \texttt{e}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=8cm]{img/Agregar_lineas.png} 
+    \caption{Agregar líneas rectas al modelo.}
+\end{figure}
+
+También creamos los arcos de circunferencia. Para ello, vamos a la opción: \texttt{Geometry > Elementary Entities > Add > Circle Arc}, como se muestra en la siguiente figura, y seleccionamos los puntos iniciales, centrales y finales para cada arco (en ese orden). Al finalizar, podemos presionar \texttt{e}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=8cm]{img/Agregar_arcos.png} 
+    \caption{Agregar arcos al modelo.}
+\end{figure}
+
+Como ya tenemos un contorno cerrado, podemos definir una superficie. Para ello, vamos a la opción: \texttt{Geometry > Elementary Entities > Add > Plane Surface}, como se muestra en la siguiente figura, y seleccionamos los contornos en orden. Al finalizar, podemos presionar \texttt{e}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=8cm]{img/Agregar_superficie.png} 
+    \caption{Agregar superficies al modelo.}
+\end{figure}
+
+Ahora, necesitamos definir \emph{grupos físicos}. Los grupos físicos permiten asociar nombres a diferentes partes del modelo como líneas y superficies. Esto nos permitirá definir la región en la que resolveremos el modelo (y asociaremos un material), las regiones que tienen desplazamientos restringidos (condiciones de frontera) y las regiones sobre las que aplicaremos la carga. En nuestro caso tendremos 4 grupos físicos:
+\begin{itemize}
+  \item Región del modelo, en donde definiremos un material;
+  \item Borde inferior, en donde restringiremos el desplazamiento en $y$;
+  \item Borde izquierdo, en donde restringiremos el desplazamiento en $x$; y
+  \item Punto superior, en donde aplicaremos la carga puntual.
+\end{itemize}
+
+Para definir los grupos físicos vamos a  \texttt{Geometry > Physical groups > Add > Plane Surface}, como muestra la siguiente figura. En este caso, podemos dejar el campo de \texttt{Name} vacío y permitir que Gmsh nombre los grupos por nosotros, los cuales serán números que luego podemos consultar en el archivo de texto.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=8cm]{img/Agregar_linea_fisica.png} 
+    \caption{Agregar grupos físicos al modelo.}
+\end{figure}
+
+Luego de editar ligeramente, el archivo de texto (.geo) este luce de la siguiente manera. Agregamos un parámetro \texttt{L}, que podremos variar a nuestro antojo para cambiar el tamaño de los elementos al crear la malla.
+\begin{listing}[H]
+    \inputminted[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=lines,
+               framesep=2mm]{c}{Prueba_brasilera.geo}
+    \caption{Archivo \texttt{.geo} para el modelo descrito.}
+    \label{lst:geo}
+\end{listing}
+
+Ahora, procedemos a crear la malla. Para ello,  vamos a \texttt{Mesh > 2D}.  Como vemos en la figura a continuación.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=8cm]{img/Mallar_2D.png} 
+    \caption{Crear la malla del modelo.}
+\end{figure}
+
+Adicionalmente, podemos cambiar la configuración para que muestre en colores, los elementos de la malla. Para ello, vamos a \texttt{Tools > Options > Mesh} y marcamos el cuadro que indica \texttt{Surface faces}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=8cm]{img/Ver_superficie_malla.png} 
+    \caption{Crear la malla del modelo.}
+\end{figure}
+
+Podemos entonces refinar la malla yendo a \texttt{Mesh > Refine by Splitting}, o midificando el parámetro \texttt{L} en el archivo de entrada (.geo). Como último paso, queremos salvar la malla. Para ello, vamos a \texttt{Mesh > Save}, o \texttt{File > Save Mesh}, como se muestra a continuación.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=8cm]{img/Grabar_malla.png} 
+    \caption{Guardar la malla a un archivo \texttt{.msh}.}
+\end{figure}
+
+
+
+\section{Código para generar los archivos de entrada}
+Debemos crear archivos con la información de los nodos (\texttt{nodes.txt}), elementos (\texttt{eles.txt}), cargas (\texttt{loads.txt}) y materiales (\texttt{mater.txt}). 
+
+El siguiente código genera los archivos de entrada necesarios para correr el programa de elementos finitos en Python.
+\inputminted[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=lines,
+               framesep=2mm]{python}{Prueba_brasilera_input.py}
+
+
+Ahora, comentemos las diferentes partes del código para ver qué hace cada una.
+
+\subsection{Encabezado y lectura de archivo \texttt{.msh}}
+La primera parte carga los módulos de Python necesarios y lee el archivo de malla que en este caso se llama \texttt{Prueba\_brasilera.msh} (línea 6 y 7). Para que Python sea capaz de leer el archivo, este debe estar en el mismo directorio que el archivo de Python que lo procesará.
+\begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=lines,
+               framesep=2mm]{python}
+from __future__ import division, print_function
+import meshio
+import numpy as np 
+
+
+points, cells, point_data, cell_data, field_data = \
+    meshio.read("Prueba_brasilera.msh")
+\end{minted}
+
+\subsection{Datos de elementos}
+La siguiente sección del código crea los datos para elementos. La línea 18 crea una variable \texttt{eles} con la información de los nodos que conforman cada triángulo. La línea 19 crea un arreglo (lleno de ceros) con la cantidad de filas igual al número de elementos (\mintpy{eles.shape[0]}) y 6 columnas\footnote{Para elementos cuadriláteros se utilizarían 7 columnas, pues cada elemento está definido por 4 nodos.}. Luego asignamos un número a cada elemento, esto lo hacemos en la línea 20 con \mintpy{range(eles.shape[0])} y esto lo asignamos a la columna 0. Todos los materiales son triángulos, por eso debemos poner 3 en la columna 1. Por último, en esta sección, asignamos los nodos de cada elemento al arreglo con \mintpy{els_array} (línea 22), y esta asignación la hacemos desde la columna 3 hasta el final con \mintpy{els_array[:, 3::]}.
+\begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=lines,
+               framesep=2mm,
+               firstnumber=17]{python}
+# Datos elementales
+eles = cells["triangle"]
+els_array = np.zeros([eles.shape[0], 6], dtype=int)
+els_array[:, 0] = range(eles.shape[0])
+els_array[:, 1] = 3
+els_array[:, 3::] = eles
+\end{minted}
+
+\subsection{Datos de nodos}
+En la siguiente sección creamos la información relacionada con los nodos. Para ello, en la línea 25 creamos un arreglo \mintpy{nodes_array} con 5 columnas y tantas filas como puntos tenemos en el modelo (\mintpy{point.shape[0]}). Luego, asignamos el número de elemento en la línea 26. Y, por último, asignamos la información de las coordenadas de los nodos en la línea 27 con \mintpy{nodes_array[:, 1:3] = points[:, :2]}, en donde estamos poniendo la información en las columnas 1 y 2.
+\begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=lines,
+               framesep=2mm,
+               firstnumber=24]{python}
+# Nodos
+nodes_array = np.zeros([points.shape[0], 5])
+nodes_array[:, 0] = range(points.shape[0])
+nodes_array[:, 1:3] = points[:, :2]
+\end{minted}
+
+\subsection{Datos de Fronteras}
+En la siguiente sección encontramos la información de líneas. Para esto, leemos la información de \mintpy{cells} en la posición \mintpy{"line"}\footnote{\mintpy{cells} es un diccionario y permite almacenar información asociada a unas palabras clave, en este caso es \mintpy{"lines"}.} (línea 30). El arreglo resultante \mintpy{lines} tendrá, entonces, la información de los nodos que forman cada línea que está en la frontera del modelo. Luego, leemos la información de las líneas físicas (línea 31), y calculamos cuántas líneas pertenecen a las líneas físicas (línea 32).
+\begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=lines,
+               framesep=2mm,
+               firstnumber=30]{python}
+# Fronteras
+lines = cells["line"]
+bounds = cell_data["line"]["physical"]
+nbounds = len(bounds)
+\end{minted}
+
+\subsection{Datos de carga}
+En la siguiente sección debemos definir la información de cargas, en este caso, las cargas las asignamos en un único punto que definimos como grupo físico. En la línea 31 leemos los nodos (en este caso, uno). Luego, creamos un arreglo que tiene tantas filas como cargas (\mintpy{nloads}) y 3 columnas. Asignamos el número del nodo al que pertenece cada carga (línea 35, las cargas en $x$ (línea 36) y las cargas en $y$ (línea 37).
+\begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=lines,
+               framesep=2mm,
+               firstnumber=30]{python}
+# Cargas
+id_cargas = cells["vertex"]
+nloads = len(id_cargas)
+load = -10e8 # N/m
+loads_array = np.zeros((nloads, 3))
+loads_array[:, 0] = id_cargas
+loads_array[:, 1] = 0
+loads_array[:, 2] = load
+\end{minted}
+
+\subsection{Condiciones de frontera}
+Ahora, procederemos a aplicar las condiciones de frontera, es decir, las regiones del modelo que tienen restricciones en el desplazamiento. Inicialmente, identificamos cuáles líneas tienen como identificador 1 (que serían las del lado izquierdo) con
+
+\mint{python}{id_izq = [cont for cont in range(nbounds) if bounds[cont] == 1]}
+
+Esto crea una lista con los números (\mintpy{cont}) para los cuales se cumple la condición (\mintpy{bounds[cont] == 1}). Ahora, en la línea 46 obtenemos los nodos que pertenecen a estas líneas, sin embargo, este arreglo tiene tantas filas como líneas en el lado izquierdo y dos columnas. Primero volvemos este arreglo como un arreglo unidimensional con \mintpy{nodes_izq.flatten()}. Posteriormente, en la línea 50, asignamos el valor de -1 en la tercera columna del arreglo \mintpy{nodes_array} para los nodos que pertenezcan al lado izquierdo. De igual forma, se repite este proceso para los nodos en la frontera inferior.
+\begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=lines,
+               framesep=2mm,
+               firstnumber=30]{python}
+# Condiciones de frontera
+id_izq = [cont for cont in range(nbounds) if bounds[cont] == 1]
+id_inf = [cont for cont in range(nbounds) if bounds[cont] == 2]
+nodes_izq = lines[id_izq]
+nodes_izq = nodes_izq.flatten()
+nodes_inf = lines[id_inf]
+nodes_inf = nodes_inf.flatten()
+nodes_array[nodes_izq, 3] = -1
+nodes_array[nodes_inf, 4] = -1
+\end{minted}
+
+\subsection{Materiales}
+En la siguiente sección asignamos los materiales correspondientes a cada elemento. En este caso, sólo tenemos un material. Sin embargo, se presenta el ejemplo como si hubieran dos diferentes.  Primero, creamos un arreglo con la información de materiales en donde la primera columna representa el módulo de Young y la segunda la relación de Poisson (línea 54). Luego, leemos la información de los grupos físicos de superficies en la línea 56. Finalmente, asignamos el valor de 0 a los materiales que tengan como grupo físico 4 (ver archivo \texttt{.geo} arriba) y 1 a los otros, que en este caso serán cero (línea 57). Esta información va en la columna 2 del arreglo \mintpy{els_array}.
+\begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=lines,
+               framesep=2mm,
+               firstnumber=30]{python}
+#  Materiales
+mater_array = np.array([[186e9, 0.29],
+                        [70e9, 0.35]])
+maters = cell_data["triangle"]["physical"]
+els_array[:, 2]  = [0 if mater == 4 else 1 for mater in maters]
+\end{minted}
+
+\subsection{Materiales}
+La última sección usa la función \mintpy{savetxt} de \texttt{numpy} para exportar los archivos.
+\begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=lines,
+               framesep=2mm,
+               firstnumber=30]{python}
+# Generar archivos
+np.savetxt("eles.txt", els_array, fmt="%d")
+np.savetxt("nodes.txt", nodes_array,
+           fmt=("%d", "%.4f", "%.4f", "%d", "%d"))
+np.savetxt("loads.txt", loads_array, fmt=("%d", "%.6f", "%.6f"))
+np.savetxt("mater.txt", mater_array, fmt="%.6f")
+\end{minted}
+
+
+\section{Solución del modelo por Elementos Finitos}
+Para resolver el modelo se debe ejecutar el programa \texttt{solids\_ISO\_GUI.py}\footnote{Para hacer uso de la interfaz gráfica debe estar instalado \texttt{eaygui}.}. Luego de correr este programa aparecerá una ventana emergente como se muestra a continuación. En esta ventana emergente se debe ubicar el directorio en donde están los archivos de entrada generados anteriormente. Tenga en cuenta que la apariencia de esta ventana puede variar entre sistemas operativos. También tenga en cuenta que en algunas ocasiones la ventana emergente puede quedar oculta por otras ventanas en su escritorio.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=5cm]{img/solids_ISO-ventana.png} 
+    \caption{Ventana emergente para ubicar el directorio con los archivos de entrada.}
+\end{figure}
+
+Luego aparece una ventana emergente que pregunta por el nombre del proyecto.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=3cm]{img/solids_ISO-nombre.png} 
+    \caption{Ventana emergente para escribir el nombre del proyecto.}
+\end{figure}
+
+A continuación, aparece una ventana emergente preguntando si desea exportar algunos archivos, presiones No.
+Luego aparece una ventana emergente que pregunta por el nombre del proyecto.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=3cm]{img/solids_ISO-echo.png} 
+    \caption{Ventana emergente preguntando por la escritura de archivos.}
+\end{figure}
+
+En este punto, el programa debe resolver su modelo. Si se usan los archivos de entrada sin modificaciones el programa debe imprimir lo siguiente en la consola de Python
+\begin{verbatim}
+Number of nodes: 123
+Number of elements: 208
+Number of equations: 224
+Duration for system solution: 0:00:00.086983
+Duration for post processing: 0:00:00
+Analysis terminated successfully!
+\end{verbatim}
+los tiempos que se toma en solucionar el sistema pueden cambiar un poco de un computador a otro.
+
+Como último paso, el programa genera unos gráficos con los campos de desplazamientos, deformaciones y esfuerzos, como se muestra en la siguiente figura.
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=5cm]{img/Prueba_brasilera_ux.pdf} 
+    \includegraphics[height=5cm]{img/Prueba_brasilera_uy.pdf}
+    \caption{Solución de desplazamientos para el modelo. \textbf{(Izquierda)} Desplazamientos horizontales.
+    \textbf{(Derecha)} Desplazamientos verticales.}
+\end{figure}
+
+
+\appendix
+\section{Ejemplo de archivos de entrada para una malla sencilla}
+Supongamos que tenemos un cuadrado de lado 1, con dos cargas en los nodos superiores y los nodos inferiores empotrados, y que está hecho de acero 1020, el cual tiene un módulo de Young $E = 186$ GPa y una relación de Poisson de $\nu = 0.29$.
+
+Si subdividimos el cuadrado en dos triángulos, tendríamos como archivos de entrada
+\begin{listing}[H]
+    \begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=4,
+               frame=lines,
+               framesep=2mm]{python}
+    0  0.0  0.0 -1 -1
+    1  1.0  0.0 -1 -1
+    2  1.0  1.0  0  0
+    3  1.0  0.0  0  0
+    \end{minted}
+    \caption{Archivo \texttt{nodes.txt}.}
+    \label{lst:nodes}
+\end{listing}
+
+
+\begin{listing}[H]
+    \begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=4,
+               frame=lines,
+               framesep=2mm]{python}
+    0  3  0  0  1  3 
+    1  3  0  1  2  3
+    \end{minted}
+    \caption{Archivo \texttt{eles.txt}.}
+    \label{lst:elements}
+\end{listing}
+
+\begin{listing}[H]
+    \begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=4,
+               frame=lines,
+               framesep=2mm]{python}
+    2  1  1
+    3  1  1
+    \end{minted}
+    \caption{Archivo \texttt{loads.txt}.}
+    \label{lst:loads}
+\end{listing}
+
+\begin{listing}[H]
+    \begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=4,
+               frame=lines,
+               framesep=2mm]{python}
+    185e9  0.29
+    \end{minted}
+    \caption{Archivo \texttt{mater.txt}.}
+    \label{lst:mater}
+\end{listing}
+
+Si quisiéramos generar esta malla a partir de Gmsh, tendríamos como archivo \texttt{.geo}:
+\begin{listing}[H]
+	\inputminted[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=lines,
+               framesep=2mm]{c}{Cuadrado.geo}
+    \caption{Archivo \texttt{Cuadrado.geo}.}
+    \label{lst:mater}
+\end{listing}
+
+
+
+\begin{thebibliography}{9}
+\bibitem{brazilian_test}
+	ASTM D3967--16 (2016),
+	Standard Test Method for Splitting Tensile Strength of Intact Rock Core Specimens,
+	ASTM International,\url{www.astm.org}.
+
+\bibitem{programming_python}
+   Linge, Svein, y Hans Petter Langtangen. 2016.
+   Programming for computations -- Python: a gentle introduction to numerical simulations with Python.
+   \url{http://link.springer.com/book/10.1007%2F978-3-319-32428-9}.
+ 
+\bibitem{scipy-lectures}
+    Gaël Varoquaux, Emmanuelle Gouillart, y Olav Vahtras (2016).
+    Getting started with Python for science, en Scipy Lecture Notes. 
+    Fecha de consulta: mayo 13, 2017 desde \url{http://www.scipy-lectures.org/intro/index.html}.
+
+\bibitem{avdis2012}
+    Avdis, A., y S. L. Mouradian (2012), 
+    \emph{A Gmsh tutorial},
+    Fecha de consulta: mayo 13, 2017 desde \url{https://albertsk.files.wordpress.com/2012/12/gmsh_tutorial.pdf}.
+  
+\bibitem{gmsh}
+    Geuzaine, Christophe, y Jean-François Remacle (2009),
+    \emph{Gmsh: A 3-D finite element mesh generator with built-in
+    pre-and post-processing facilities}.
+    International Journal for Numerical Methods in Engineering, 79.11.
+    
+\bibitem{gmsh-tutorial}
+ Geuzaine, Christophe, y Jean-François Remacle (2017),
+ Tutorial Oficial de Gmsh.
+ Fecha de consulta: mayo 13, 2017 desde \url{http://gmsh.info/doc/texinfo/gmsh.html#Tutorial}.
+
+\bibitem{gmsh-screencast}
+ Geuzaine, Christophe, y Jean-François Remacle (2017),
+ \emph{Screencasts} oficiales de Gmsh.
+ Fecha de consulta: mayo 13, 2017 desde \url{http://gmsh.info/screencasts/}.
+
+\end{thebibliography}
+
+\end{document}
