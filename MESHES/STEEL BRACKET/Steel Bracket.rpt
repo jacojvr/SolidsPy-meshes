@@ -1,0 +1,63 @@
+*****************************************************************
+      SolidWorks Corporation - Informe de estado del procesador de IGES
+*****************************************************************
+=================================================================
+Información general
+=================================================================
+Enviando I.D. de producto de sistema  : Steel Bracket
+Recibiendo I.D. de producto de sistema: Steel Bracket
+Nombre de archivo                    : C:\Users\asus\Desktop\Steel Bracket\Steel Bracket.IGS
+Enviando sistema               : SolidWorks 2017
+Versión de preprocesador         : SolidWorks 2017
+Fecha de creación del archivo           : 170609.174519
+Fecha de creación del modelo          : 170609.174519
+Unidades                        : CM
+Escala espacial del modelo            : 1
+Autor                       : asus
+Organización                 : 
+
+
+=================================================================
+Información de procesamiento de entidades
+=================================================================
+
+
+=================================================================
+Análisis de precisión del archivo de IGES:
+=================================================================
+  Número de dígitos significativos más frecuente:               3
+  Número de dígitos significativos más alto:                      4
+  Número de dígitos significativos promedio:                2.44444
+  Distancia máxima hasta el origen:                          43.3411
+  Distancia mínima hasta el origen:                             10.5
+  Número de dígitos significativos efectivo:               3.7853
+
+
+=================================================================
+Resumen de entidades
+=================================================================
+-----------------------------------------------------------------
+Nombre de tipo                                         Número convertido
+---- ----                                         ----- ---------
+102  Composite curve                                  8         8
+110  Line                                            57        57
+126  Rational B-spline curve                         57        57
+128  Rational B-spline surface                        1         1
+142  Curve on a parametric surface                    4         4
+144  Trimmed parametric surface                       1         1
+314  Color definition                                 1         1
+_________________________________________________________________
+
+
+=================================================================
+Resumen de resultados
+=================================================================
+Tipo de operación de SolidWorks                Número
+-----------------------                -----
+Operaciones sólidas0
+Operaciones de superficie1
+Operaciones de curvas/croquis0
+--------------------------------------------
+Hora de comienzo: domingo, junio 11, 2017 23:13:00
+Hora de finalización: domingo, junio 11, 2017 23:13:01
+Tiempo de procesamiento: 0 days, 00 hours, 00 mins, 01 secs
