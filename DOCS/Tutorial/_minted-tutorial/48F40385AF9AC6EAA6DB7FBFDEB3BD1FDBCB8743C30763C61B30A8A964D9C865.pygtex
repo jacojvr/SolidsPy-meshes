@@ -1,3 +1,0 @@
-\begin{Verbatim}[commandchars=\\\{\}]
-\PYG{n}{id\PYGZus{}izq} \PYG{o}{=} \PYG{p}{[}\PYG{n}{cont} \PYG{k}{for} \PYG{n}{cont} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{nbounds}\PYG{p}{)} \PYG{k}{if} \PYG{n}{bounds}\PYG{p}{[}\PYG{n}{cont}\PYG{p}{]} \PYG{o}{==} \PYG{l+m+mi}{1}\PYG{p}{]}
-\end{Verbatim}
