@@ -3,8 +3,8 @@
 ![Structured mesh with traingular elements.](./docs/img/llave.png)
 
 
-This _repo_ contains several finite element meshes, most of them created with GMSH, and to be analyzed with the python code
-SOLIDS-ISO
+This _repo_ contains several finite element meshes, most of them created with [Gmsh](http://gmsh.info/), and to be analyzed with the python code
+[SOLIDSPy](https://github.com/AppliedMechanics-EAFIT/SolidsPy)
 ## Authors
 - [Juan David Gómez Cataño](http://www.eafit.edu.co/docentes-investigadores/Paginas/juan-gomez.aspx),
     Professor at Universidad EAFIT.
