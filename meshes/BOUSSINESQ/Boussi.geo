@@ -1,5 +1,5 @@
-L = DefineNumber[ 1.0, Name "Parameters/L" ];
-H = DefineNumber[ 1.0, Name "Parameters/H" ];
+L = DefineNumber[ 10.0, Name "Parameters/L" ];
+H = DefineNumber[ 10.0, Name "Parameters/H" ];
 ele = L/20.0;
 Point(1) = {-L, 0, 0, ele};
 Point(2) = {L, 0, 0, ele};
