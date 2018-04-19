@@ -200,3 +200,7 @@ $Elements
 140 2 2 0 1 27 13 14
 141 2 2 0 1 28 13 27
 $EndElements
+//+
+Rotate {{0, 1, 0}, {0, 0, 0}, Pi/6} {
+  Surface{1}; 
+}
