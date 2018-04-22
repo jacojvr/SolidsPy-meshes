@@ -12,7 +12,7 @@ import numpy as np
 
 
 points, cells, point_data, cell_data, field_data = \
-    meshio.read("Losa_aligerante.msh")
+    meshio.read("voided_slab.msh")
 
 # Datos elementales
 eles = cells["triangle"]
@@ -28,7 +28,7 @@ nodes_array[:, 1:3] = points[:, :2]
 
 # Fronteras
 lines = cells["line"]
-bounds = cell_data["line"]["physical"]
+bounds = cell_data["line"]["gmsh:physical"]
 nbounds = len(bounds)
 
 # Cargas
