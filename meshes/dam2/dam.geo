@@ -24,9 +24,14 @@ Line(7) = {6, 3};
 
 // Surface
 Line Loop(1) = {1, 2, 3, 4};
-Plane Surface(1) = {1};
+Plane Surface(1) = {-1};
 Line Loop(2) = {5, 6, 7, 3};
 Plane Surface(2) = {2};
+
+// Physical groups
+Physical Line(1) = {6};
+Physical Line(2) = {5};
+Physical Surface(3) = {2, 1};
 
 // Meshing parameters
 Transfinite Line{1, 3, 6} = ndiv_hor;
@@ -34,4 +39,5 @@ Transfinite Line{2, 4} = ndiv_vert;
 Transfinite Line{5, 7} = ndiv_base;
 Transfinite Surface{1};
 Transfinite Surface{2};
+
 
