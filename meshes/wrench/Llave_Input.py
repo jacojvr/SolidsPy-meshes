@@ -10,8 +10,11 @@ import meshio
 import numpy as np 
 
 
-points, cells, point_data, cell_data, field_data = \
-    meshio.read("Llave.msh")
+mesh = meshio.read("Llave.msh")
+points = mesh.points
+cells = mesh.cells
+point_data = mesh.point_data
+cell_data = mesh.cell_data
 
 # Datos elementales
 eles = cells["triangle"]
@@ -27,7 +30,7 @@ nodes_array[:, 1:3] = points[:, :2]
 
 # Fronteras
 lines = cells["line"]
-bounds = cell_data["line"]["physical"]
+bounds = cell_data["line"]["gmsh:physical"]
 nbounds = len(bounds)
 
 # Cargas
@@ -48,7 +51,7 @@ nodes_array[nodes_fijo, 3:] = -1
 
 #  Materiales
 mater_array = np.array([[200e9, 0.285]])
-maters = cell_data["triangle"]["physical"]
+maters = cell_data["triangle"]["gmsh:physical"]
 
 # Generar archivos
 np.savetxt("eles.txt", els_array, fmt="%d")

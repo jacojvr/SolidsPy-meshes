@@ -6,14 +6,12 @@ Solve for a wrench with a force applied in one extreme
 """
 from __future__ import division, print_function
 import numpy as np
-from os import sys
-sys.path.append(r"C:\Users\nguarinz\workspace\FEM_PYTHON\main")
 from datetime import datetime
 import matplotlib.pyplot as plt
-import preprocesor as pre
-import postprocesor as pos
-import assemutil as ass
-import solutil as sol
+import solidspy.preprocesor as pre
+import solidspy.postprocesor as pos
+import solidspy.assemutil as ass
+import solidspy.solutil as sol
 
 start_time = datetime.now()
 
@@ -30,15 +28,13 @@ RHSG = ass.loadasem(loads, IBC, neq)
 
 #%% SYSTEM SOLUTION
 UG = sol.static_sol(KG, RHSG)
-if not(np.allclose(KG.dot(UG), RHSG)):
-    print("The system is not in equilibrium!")
 end_time = datetime.now()
 print('Duration for system solution: {}'.format(end_time - start_time))
 
 #%% POST-PROCESSING
 start_time = datetime.now()
 UC = pos.complete_disp(IBC, nodes, UG)
-E_nodes, S_nodes = pos.strain_nodes(nodes , elements, mats, UC, DME)
+E_nodes, S_nodes = pos.strain_nodes(nodes , elements, mats, UC)
 #pos.fields_plot(elements, nodes, UC)
 umag = np.linalg.norm(UC, axis=1)
 mises = np.sqrt(S_nodes[:, 0]**2 - S_nodes[:, 0]*S_nodes[:, 1] +
@@ -50,6 +46,7 @@ pos.tri_plot(tri, umag, title=r"$\Vert \mathbf{u}\Vert$ (mm)", levels=12)
 plt.subplot(122)
 pos.tri_plot(tri, mises, title=r"von Mises Stress (MPa)", levels=12)
 plt.savefig("wrench.png", dpi=300)
+end_time = datetime.now()
 print('Duration for post processing: {}'.format(end_time - start_time))
 print('Analysis terminated successfully!')
 plt.show()
