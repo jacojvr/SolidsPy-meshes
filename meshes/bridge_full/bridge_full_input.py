@@ -10,8 +10,13 @@ import meshio
 import numpy as np 
 
 
-points, cells, point_data, cell_data, field_data = \
-    meshio.read("Limyra bridge arch.msh")
+
+mesh = meshio.read("Limyra bridge arch.msh")
+points = mesh.points
+cells = mesh.cells
+point_data = mesh.point_data
+cell_data = mesh.cell_data
+field_data = mesh.field_data
 
 span = 12.75
 rise = 2
