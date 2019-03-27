@@ -1,37 +1,41 @@
 # -*- coding: utf-8 -*-
 """
-Genera archivos de entrada para el programa de elementos finitos
-FEM_iso para la prueba brasilera, usando 2 simetrías en el modelo.
+Create input files for the FEM program Solidspy for the brazilian
+test using 2 symmetries in the model.
 
 @author: Nicolas Guarin-Zapata
-@date: Mayo 18, 2017
+@date: March 2010
 """
-from __future__ import division, print_function
 import meshio
 import numpy as np 
 
 
-points, cells, point_data, cell_data, field_data = \
-    meshio.read("Prueba_brasilera.msh")
 
-# Datos elementales
+mesh = meshio.read("brazilian_test.msh")
+points = mesh.points
+cells = mesh.cells
+point_data = mesh.point_data
+cell_data = mesh.cell_data
+field_data = mesh.field_data
+
+# Element data
 eles = cells["triangle"]
 els_array = np.zeros([eles.shape[0], 6], dtype=int)
 els_array[:, 0] = range(eles.shape[0])
 els_array[:, 1] = 3
 els_array[:, 3::] = eles
 
-# Nodos
+# Nodes
 nodes_array = np.zeros([points.shape[0], 5])
 nodes_array[:, 0] = range(points.shape[0])
 nodes_array[:, 1:3] = points[:, :2]
 
-# Fronteras
+# Boundaries
 lines = cells["line"]
-bounds = cell_data["line"]["physical"]
+bounds = cell_data["line"]["gmsh:physical"]
 nbounds = len(bounds)
 
-# Cargas
+# Loads
 id_cargas = cells["vertex"]
 nloads = len(id_cargas)
 load = -10e8 # N/m
@@ -40,7 +44,7 @@ loads_array[:, 0] = id_cargas
 loads_array[:, 1] = 0
 loads_array[:, 2] = load
 
-# Condiciones de frontera
+# Boundary conditions
 id_izq = [cont for cont in range(nbounds) if bounds[cont] == 1]
 id_inf = [cont for cont in range(nbounds) if bounds[cont] == 2]
 nodes_izq = lines[id_izq]
@@ -53,7 +57,7 @@ nodes_array[nodes_inf, 4] = -1
 #  Materiales
 mater_array = np.array([[186e9, 0.29],
                         [70e9, 0.35]])
-maters = cell_data["triangle"]["physical"]
+maters = cell_data["triangle"]["gmsh:physical"]
 els_array[:, 2]  = [0 if mater == 4 else 1 for mater in maters]
 
 # Generar archivos
